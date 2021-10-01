@@ -14,7 +14,7 @@ publishing {
     publications {
         create<MavenPublication>("maven") {
             groupId = "dev.ligature"
-            artifactId = "rakkoon"
+            artifactId = "gaze"
             version = "0.1.0-SNAPSHOT"
 
             from(components["java"])
