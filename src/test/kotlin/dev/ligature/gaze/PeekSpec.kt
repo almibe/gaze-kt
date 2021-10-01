@@ -19,7 +19,7 @@ class PeekSpec : FunSpec() {
         test("empty input") {
             val rakkoon = Rakkoon("")
             rakkoon.peek() shouldBe null
-            rakkoon.nibble(fiveNibbler).shouldBeInstanceOf<None>()
+            rakkoon.attempt(fiveNibbler).shouldBeInstanceOf<None>()
             rakkoon.peek() shouldBe null
             rakkoon.isComplete().shouldBe(true)
         }
@@ -27,7 +27,7 @@ class PeekSpec : FunSpec() {
         test("single 5 input") {
             val rakkoon = Rakkoon("5")
             rakkoon.peek() shouldBe '5'
-            rakkoon.nibble(fiveNibbler).shouldBe(Some(Match("5", IntRange(0,1))))
+            rakkoon.attempt(fiveNibbler).shouldBe(Some(Match("5", IntRange(0,1))))
             rakkoon.peek() shouldBe null
             rakkoon.isComplete().shouldBe(true)
         }
@@ -35,11 +35,11 @@ class PeekSpec : FunSpec() {
         test("hello world test") {
             val rakkoon = Rakkoon("hello world")
             rakkoon.peek() shouldBe 'h'
-            rakkoon.nibble(helloNibbler).shouldBe(Some(Match("hello", IntRange(0,5))))
+            rakkoon.attempt(helloNibbler).shouldBe(Some(Match("hello", IntRange(0,5))))
             rakkoon.peek() shouldBe ' '
-            rakkoon.nibble(spaceNibbler).shouldBe(Some(Match(" ", IntRange(5,6))))
+            rakkoon.attempt(spaceNibbler).shouldBe(Some(Match(" ", IntRange(5,6))))
             rakkoon.peek() shouldBe 'w'
-            rakkoon.nibble(worldNibbler).shouldBe(Some(Match("world", IntRange(6,11))))
+            rakkoon.attempt(worldNibbler).shouldBe(Some(Match("world", IntRange(6,11))))
             rakkoon.peek() shouldBe null
             rakkoon.isComplete().shouldBe(true)
         }
@@ -47,11 +47,11 @@ class PeekSpec : FunSpec() {
         test("hello5world test") {
             val rakkoon = Rakkoon("hello5world")
             rakkoon.peek() shouldBe 'h'
-            rakkoon.nibble(helloNibbler).shouldBe(Some(Match("hello", IntRange(0,5))))
+            rakkoon.attempt(helloNibbler).shouldBe(Some(Match("hello", IntRange(0,5))))
             rakkoon.peek() shouldBe '5'
-            rakkoon.nibble(fiveNibbler).shouldBe(Some(Match("5", IntRange(5,6))))
+            rakkoon.attempt(fiveNibbler).shouldBe(Some(Match("5", IntRange(5,6))))
             rakkoon.peek() shouldBe 'w'
-            rakkoon.nibble(worldNibbler).shouldBe(Some(Match("world", IntRange(6,11))))
+            rakkoon.attempt(worldNibbler).shouldBe(Some(Match("world", IntRange(6,11))))
             rakkoon.peek() shouldBe null
             rakkoon.isComplete().shouldBe(true)
         }

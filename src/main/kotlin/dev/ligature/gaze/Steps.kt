@@ -8,9 +8,9 @@ package dev.ligature.gaze
  * stringNibbler matches a given String entirely
  */
 @OptIn(ExperimentalUnsignedTypes::class)
-fun stringNibbler(toMatch: String) = Nibbler { lookAhead ->
+fun stringNibbler(toMatch: String) = Step { lookAhead ->
     var offset = 0U
-    var result: NibState? = null
+    var result: State? = null
     while (offset.toInt() <= toMatch.length) {
         if (offset.toInt() == toMatch.length - 1 && toMatch[offset.toInt()] == lookAhead.peek(offset)) {
             result = Complete(offset.toInt() + 1)
@@ -29,7 +29,7 @@ fun stringNibbler(toMatch: String) = Nibbler { lookAhead ->
  * charNibbler matches input against the passed characters
  */
 @OptIn(ExperimentalUnsignedTypes::class)
-fun charNibbler(vararg chars: Char) = Nibbler { lookAhead ->
+fun charNibbler(vararg chars: Char) = Step { lookAhead ->
     var offset = 0U
     while (lookAhead.peek(offset) != null) {
         var match = false
@@ -56,7 +56,7 @@ fun charNibbler(vararg chars: Char) = Nibbler { lookAhead ->
  * rangeNibbler matches characters that exist within a given set of CharRanges
  */
 @OptIn(ExperimentalUnsignedTypes::class)
-fun rangeNibbler(vararg ranges: CharRange) = Nibbler { lookAhead ->
+fun rangeNibbler(vararg ranges: CharRange) = Step { lookAhead ->
     var offset = 0U
     while (lookAhead.peek(offset) != null) {
         var match = false
@@ -83,7 +83,7 @@ fun rangeNibbler(vararg ranges: CharRange) = Nibbler { lookAhead ->
  * predicateNibbler is helper that checks a single character against a given predicate
  */
 @OptIn(ExperimentalUnsignedTypes::class)
-fun predicateNibbler(fn: (Char?) -> Boolean) = Nibbler { lookAhead ->
+fun predicateNibbler(fn: (Char?) -> Boolean) = Step { lookAhead ->
     var offset = 0U
     while (lookAhead.peek(offset) != null) {
         if (fn(lookAhead.peek(offset))) {

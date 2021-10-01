@@ -6,23 +6,23 @@ package dev.ligature.gaze
 
 import arrow.core.*
 
-sealed class NibState
+sealed interface State
 
 /**
  * The Cancel state means that this Nibbler didn't match and Rakkoon should jump back to its position before
  * starting this Nibbler.
  * The nibble method will also return None.
  */
-object Cancel: NibState()
+object Cancel: State
 
 /**
  * The Complete state means that this Nibbler completed and Rakkoon should adjust its offset based on the adjust param.
  * A Some(Match) is returned by the nibble method.
  */
-data class Complete(val adjust: Int = 0): NibState()
+data class Complete(val adjust: Int = 0): State
 
-fun interface Nibbler {
-    fun taste(lookAhead: LookAhead): NibState
+fun interface Step {
+    fun taste(lookAhead: LookAhead): State
 }
 
 interface LookAhead {
@@ -45,9 +45,9 @@ class Rakkoon(private var input: CharSequence): LookAhead {
         offset += distance.toInt()
     }
 
-    fun nibble(nibbler: Nibbler): Option<Match> {
+    fun attempt(step: Step): Option<Match> {
         val start = offset
-        return when (val res = nibbler.taste(this)) {
+        return when (val res = step.taste(this)) {
             is Cancel -> {
                 offset = start
                 none()
@@ -59,11 +59,11 @@ class Rakkoon(private var input: CharSequence): LookAhead {
         }
     }
 
-    fun nibble(vararg nibblers: Nibbler): Option<List<Match>> {
+    fun attempt(vararg steps: Step): Option<List<Match>> {
         val resultList = mutableListOf<Match>()
         val start = offset
-        for (nibbler in nibblers) {
-            when (val res = nibble(nibbler)) {
+        for (nibbler in steps) {
+            when (val res = attempt(nibbler)) {
                 is None -> {
                     offset = start
                     return none()

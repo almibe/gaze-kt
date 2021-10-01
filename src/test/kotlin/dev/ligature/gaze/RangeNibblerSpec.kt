@@ -17,45 +17,45 @@ class RangeNibblerSpec : FunSpec() {
     init {
         test("empty input") {
             val rakkoon = Rakkoon("")
-            rakkoon.nibble(fiveNibbler).shouldBeInstanceOf<None>()
-            rakkoon.nibble(digitNibbler).shouldBeInstanceOf<None>()
-            rakkoon.nibble(alphaNibbler).shouldBeInstanceOf<None>()
+            rakkoon.attempt(fiveNibbler).shouldBeInstanceOf<None>()
+            rakkoon.attempt(digitNibbler).shouldBeInstanceOf<None>()
+            rakkoon.attempt(alphaNibbler).shouldBeInstanceOf<None>()
             rakkoon.isComplete().shouldBe(true)
         }
 
         test("single 5 input") {
             val rakkoon = Rakkoon("5")
-            rakkoon.nibble(fiveNibbler).shouldBe(Some(Match("5", IntRange(0,1))))
+            rakkoon.attempt(fiveNibbler).shouldBe(Some(Match("5", IntRange(0,1))))
             rakkoon.isComplete().shouldBe(true)
         }
 
         test("single 4 input") {
             val rakkoon = Rakkoon("4")
-            rakkoon.nibble(fiveNibbler).shouldBeInstanceOf<None>()
+            rakkoon.attempt(fiveNibbler).shouldBeInstanceOf<None>()
             rakkoon.isComplete().shouldBe(false)
         }
 
         test ("multiple 5s input") {
             val rakkoon = Rakkoon("55555")
-            val res = rakkoon.nibble(fiveNibbler)
+            val res = rakkoon.attempt(fiveNibbler)
             res shouldBe Some(Match("55555", IntRange(0,5)))
         }
 
         test ("digit input") {
             val rakkoon = Rakkoon("005676356234534542100000")
-            val res = rakkoon.nibble(digitNibbler)
+            val res = rakkoon.attempt(digitNibbler)
             res shouldBe Some(Match("005676356234534542100000", IntRange(0,24)))
         }
 
         test("test alpha input") {
             val rakkoon = Rakkoon("abcyyyycccaaazzzz")
-            rakkoon.nibble(alphaNibbler).shouldBe(Some(Match("abcyyyycccaaazzzz", IntRange(0, 17))))
+            rakkoon.attempt(alphaNibbler).shouldBe(Some(Match("abcyyyycccaaazzzz", IntRange(0, 17))))
             rakkoon.isComplete().shouldBe(true)
         }
 
         test("simple testing vararg overload of nibble") {
             val rakkoon = Rakkoon("abc456zxya")
-            rakkoon.nibble(alphaNibbler, digitNibbler, alphaNibbler).shouldBe(Some(listOf(
+            rakkoon.attempt(alphaNibbler, digitNibbler, alphaNibbler).shouldBe(Some(listOf(
                 Match("abc", IntRange(0,3)),
                 Match("456", IntRange(3,6)),
                 Match("zxya", IntRange(6,10))
