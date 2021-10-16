@@ -4,63 +4,59 @@
 
 package dev.ligature.gaze
 
-import arrow.core.*
-
-sealed interface State
+sealed trait State
 
 /**
  * The Cancel state means that this Nibbler didn't match and Rakkoon should jump back to its position before
  * starting this Nibbler.
  * The nibble method will also return None.
  */
-object Cancel: State
+object Cancel extends State
 
 /**
  * The Complete state means that this Nibbler completed and Rakkoon should adjust its offset based on the adjust param.
  * A Some(Match) is returned by the nibble method.
  */
-data class Complete(val adjust: Int = 0): State
+case class Complete(val adjust: Int = 0) extends State
 
-fun interface Step {
-    fun taste(lookAhead: LookAhead): State
+trait Step {
+    def taste(lookAhead: LookAhead): State
 }
 
-interface LookAhead {
-    @OptIn(ExperimentalUnsignedTypes::class)
-    fun peek(distance: UInt = 0U): Char?
+trait LookAhead {
+    def peek(distance: Long = 0): Option[Char]
 }
 
-data class Match(val value: String, val range: IntRange)
+case class Match(val value: String, val range: IntRange)
 
-class Rakkoon(private var input: CharSequence): LookAhead {
+class Rakkoon(private var input: CharSequence) extends LookAhead {
     private var offset = 0
 
-    @OptIn(ExperimentalUnsignedTypes::class)
-    override fun peek(distance: UInt): Char? =
-        if (offset + distance.toInt() < input.length) input[offset + distance.toInt()]
+    override def peek(distance: Int): Option[Char] =
+        if (offset + distance < input.length) input[offset + distance]
         else null
 
-    @OptIn(ExperimentalUnsignedTypes::class)
-    fun bite(distance: UInt) {
-        offset += distance.toInt()
+    def bite(distance: Int) = {
+        offset += distance
     }
 
-    fun attempt(step: Step): Option<Match> {
+    def attempt(step: Step): Option[Match] = {
         val start = offset
-        return when (val res = step.taste(this)) {
-            is Cancel -> {
+        val res = step.taste(this)
+        res match {
+            case Cancel => {
                 offset = start
-                none()
+                None
             }
-            is Complete -> {
+            case Complete => {
                 offset += res.adjust
                 Some(Match(input.substring(start, offset), IntRange(start, offset)))
             }
         }
     }
 
-    fun attempt(vararg steps: Step): Option<List<Match>> {
-        val resultList = mutableListOf<Match>()
+    def attempt(steps: Step*): Option[List[Match]] = {
+        val resultList: MutableList[Match] = MutableList()
         val start = offset
         for (nibbler in steps) {
             when (val res = attempt(nibbler)) {
@@ -76,11 +72,11 @@ class Rakkoon(private var input: CharSequence): LookAhead {
         return Some(resultList)
     }
 
-    fun currentOffset(): Int = offset
+    def currentOffset(): Int = offset
 
-    fun remainingText(): String = input.substring(offset)
+    def remainingText(): String = input.substring(offset)
 
-    fun isComplete(): Boolean {
+    def isComplete(): Boolean = {
         return input.length <= offset
     }
 }
