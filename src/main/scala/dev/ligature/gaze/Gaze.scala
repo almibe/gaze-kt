@@ -4,79 +4,58 @@
 
 package dev.ligature.gaze
 
-sealed trait State
-
-/**
- * The Cancel state means that this Nibbler didn't match and Rakkoon should jump back to its position before
- * starting this Nibbler.
- * The nibble method will also return None.
- */
-object Cancel extends State
-
-/**
- * The Complete state means that this Nibbler completed and Rakkoon should adjust its offset based on the adjust param.
- * A Some(Match) is returned by the nibble method.
- */
-case class Complete(val adjust: Int = 0) extends State
-
-trait Step {
-    def taste(lookAhead: LookAhead): State
+def from(text: String): Gaze[Char] = { //TODO eventually handle unicode better and make this Gaze[String]
+    return new Gaze(text.toVector)
+    // let input = text.graphemes(true).collect::<Vec<&str>>();
+    // Gaze { input, offset: 0 }
 }
 
-trait LookAhead {
-    def peek(distance: Long = 0): Option[Char]
-}
-
-case class Match(val value: String, val range: IntRange)
-
-class Rakkoon(private var input: CharSequence) extends LookAhead {
-    private var offset = 0
-
-    override def peek(distance: Int): Option[Char] =
-        if (offset + distance < input.length) input[offset + distance]
-        else null
-
-    def bite(distance: Int) = {
-        offset += distance
-    }
-
-    def attempt(step: Step): Option[Match] = {
-        val start = offset
-        val res = step.taste(this)
-        res match {
-            case Cancel => {
-                offset = start
-                None
-            }
-            case Complete => {
-                offset += res.adjust
-                Some(Match(input.substring(start, offset), IntRange(start, offset)))
-            }
-        }
-    }
-
-    def attempt(steps: Step*): Option[List[Match]] = {
-        val resultList: MutableList[Match] = MutableList()
-        val start = offset
-        for (nibbler in steps) {
-            when (val res = attempt(nibbler)) {
-                is None -> {
-                    offset = start
-                    return none()
-                }
-                is Some -> {
-                    resultList.add(res.value)
-                }
-            }
-        }
-        return Some(resultList)
-    }
-
-    def currentOffset(): Int = offset
-
-    def remainingText(): String = input.substring(offset)
+class Gaze[I](private val input: Vector[I]) {
+    private var offset: Int = 0
 
     def isComplete(): Boolean = {
-        return input.length <= offset
+        return this.offset >= this.input.length
+    }
+
+    def peek(): Option[I] = {
+        if (this.isComplete()) {
+            return None
+        } else {
+            return Some(this.input(this.offset))
+        }
+    }
+
+    def next(): Option[I] = {
+        if (this.isComplete()) {
+            return None
+        } else {
+            val next = Some(this.input(this.offset))
+            this.offset += 1
+            return next
+        }
+    }
+
+    def attempt[T, E](step: Step[I, E, T]): Either[E, T] = {
+        val startOfThisLoop = this.offset
+        val res = step(this)
+
+        res match {
+            case Right(_) => return res
+            case Left(_) => {
+                this.offset = startOfThisLoop
+                return res
+            }
+        }
+    }
+
+    def ignore[T, E](step: Step[I, E, T]): Unit = {
+        val startOfThisLoop = this.offset;
+        val res = step(this);
+        res match {
+            case Left(_) => this.offset = startOfThisLoop
+            case Right(_) => return
+        }
     }
 }
+
+type Step[I, E, T] = (gaze: Gaze[I]) => Either[E, T]
