@@ -63,31 +63,44 @@ def takeString(toMatch: String): (gaze: Gaze[Char]) => Either[NoMatch, String] =
 //      }
 //  }
 
-//export function takeWhile(matcher: (toMatch: string) => boolean): (gaze: Gaze<string>) => Either<NoMatch, string> {
-//    return (gaze: Gaze<string>): Either<NoMatch, string> => {
-//        let res = ""
-//        while(true) {
-//            let peek = gaze.peek();
-//            if (peek.isJust()) {
-//                let peekValue = peek.unsafeCoerce()
-//                if (matcher(peekValue)) {
-//                    gaze.next();
-//                    res += peekValue;
-//                } else if (res.length == 0) {
-//                    return Left({});
-//                } else {
-//                    return Right(res);
-//                }
-//            } else {
-//                if (res.length == 0) {
-//                    return Left({});
-//                } else {
-//                    return Right(res);
-//                }
-//            }
-//        }
-//    }
-//}
+def takeWhile(matcher: (toMatch: Char) => Boolean): (gaze: Gaze[Char]) => Either[NoMatch, String] = {
+    return (gaze: Gaze[Char]) => {
+        val res = StringBuilder()
+        var matched = true
+        while(true) {
+            val peek = gaze.peek();
+
+            peek match {
+                case Some(c) => {
+                    if (matcher(c)) {
+                        gaze.next();
+                        res += c;
+                    } else if (res.length == 0) {
+                        matched = false
+                        break
+                    } else {
+                        break
+                        //return Right(res);
+                    }
+                }
+                case None => {
+                    if (res.length == 0) {
+                        matched = false
+                        break
+                    } else {
+                        break
+                        //return Right(res);
+                    }
+                }
+            }
+        }
+        if (matched) {
+            Right(res.toString())
+        } else {
+            Left(NoMatch)
+        }
+    }
+}
 
 //  pub fn take_while<'a, T>(
 //      matcher: &'a dyn Fn(T) -> bool,
