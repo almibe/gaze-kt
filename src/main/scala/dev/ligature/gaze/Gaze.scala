@@ -4,10 +4,10 @@
 
 package dev.ligature.gaze
 
-def from(text: String): Gaze[Char] = { //TODO eventually handle unicode better and make this Gaze[String]
-    return new Gaze(text.toVector)
-    // let input = text.graphemes(true).collect::<Vec<&str>>();
-    // Gaze { input, offset: 0 }
+object Gaze {
+    def from(text: String): Gaze[Char] = { //TODO eventually handle unicode better and make this Gaze[String]
+        return new Gaze(text.toVector)
+    }
 }
 
 class Gaze[I](private val input: Vector[I]) {
