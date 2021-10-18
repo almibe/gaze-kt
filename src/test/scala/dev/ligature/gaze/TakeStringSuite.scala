@@ -1,136 +1,55 @@
-///* This Source Code Form is subject to the terms of the Mozilla Public
-// * License, v. 2.0. If a copy of the MPL was not distributed with this
-// * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
-//
-//package dev.ligature.gaze
-//
-//import arrow.core.*
-//import io.kotest.core.spec.style.FunSpec
-//import io.kotest.matchers.shouldBe
-//import io.kotest.matchers.types.shouldBeInstanceOf
-//
-//private val fiveNibbler = stringNibbler("5")
-//private val helloNibbler = stringNibbler("hello")
-//private val spaceNibbler = stringNibbler(" ")
-//private val worldNibbler = stringNibbler("world")
-//
-//class StringNibblerSpec : FunSpec() {
-//    init {
-//        test("empty input") {
-//            val rakkoon = Rakkoon("")
-//            rakkoon.attempt(fiveNibbler).shouldBeInstanceOf<None>()
-//            rakkoon.isComplete().shouldBe(true)
-//        }
-//
-//        test("single 5 input") {
-//            val rakkoon = Rakkoon("5")
-//            rakkoon.attempt(fiveNibbler).shouldBe(Some(Match("5", IntRange(0,1))))
-//            rakkoon.isComplete().shouldBe(true)
-//        }
-//
-//        test("single 4 input") {
-//            val rakkoon = Rakkoon("4")
-//            rakkoon.attempt(fiveNibbler).shouldBeInstanceOf<None>()
-//            rakkoon.isComplete().shouldBe(false)
-//        }
-//
-//        test ("multiple 5s input") {
-//            val rakkoon = Rakkoon("55555")
-//            val res = mutableListOf<Int>()
-//            while(!rakkoon.isComplete()) {
-//                val nres = rakkoon.attempt(fiveNibbler)
-//                if (nres.isNotEmpty()) {
-//                    res.add((nres as Some).value.value.toInt())
-//                }
-//            }
-//            res shouldBe listOf(5,5,5,5,5)
-//        }
-//
-//        test("hello world test") {
-//            val rakkoon = Rakkoon("hello world")
-//            rakkoon.attempt(helloNibbler).shouldBe(Some(Match("hello", IntRange(0,5))))
-//            rakkoon.attempt(spaceNibbler).shouldBe(Some(Match(" ", IntRange(5,6))))
-//            rakkoon.attempt(worldNibbler).shouldBe(Some(Match("world", IntRange(6,11))))
-//            rakkoon.isComplete().shouldBe(true)
-//        }
-//
-//        test("hello5world test") {
-//            val rakkoon = Rakkoon("hello5world")
-//            rakkoon.attempt(helloNibbler).shouldBe(Some(Match("hello", IntRange(0,5))))
-//            rakkoon.attempt(fiveNibbler).shouldBe(Some(Match("5", IntRange(5,6))))
-//            rakkoon.attempt(worldNibbler).shouldBe(Some(Match("world", IntRange(6,11))))
-//            rakkoon.isComplete().shouldBe(true)
-//        }
-//
-//        test("simple testing vararg overload of nibble") {
-//            val rakkoon = Rakkoon("55")
-//            rakkoon.attempt(fiveNibbler, fiveNibbler).shouldBe(Some(listOf(
-//                Match("5", IntRange(0,1)),
-//                Match("5", IntRange(1,2))
-//            )))
-//            rakkoon.isComplete().shouldBe(true)
-//        }
-//
-//        test("testing vararg overload of nibble") {
-//            val rakkoon = Rakkoon("5hello5")
-//            rakkoon.attempt(fiveNibbler, helloNibbler, fiveNibbler).shouldBe(Some(listOf(
-//                Match("5", IntRange(0,1)),
-//                Match("hello", IntRange(1,6)),
-//                Match("5", IntRange(6,7))
-//            )))
-//            rakkoon.isComplete().shouldBe(true)
-//        }
-//
-//        test("make sure all varargs pass when using overload") {
-//            val rakkoon = Rakkoon("555hello")
-//            val expectNone = rakkoon.attempt(fiveNibbler, fiveNibbler, helloNibbler)
-//            val expectResult = rakkoon.attempt(fiveNibbler, fiveNibbler, fiveNibbler, helloNibbler)
-//            expectNone.shouldBe(none())
-//            expectResult.shouldBe(Some(listOf(
-//                Match("5", IntRange(0,1)),
-//                Match("5", IntRange(1,2)),
-//                Match("5", IntRange(2,3)),
-//                Match("hello", IntRange(3,8))
-//            )))
-//        }
-//    }
-//}
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-//describe("Take String", () => {
-//  it("take string with zero values", () => {
-//    let gaze = Gaze.from("")
-//    let ts = takeString("hello")
-//    gaze.attempt(ts).should.be.eql(Left({}))
-//    gaze.isComplete().should.be.true
-//    gaze.peek().should.be.eql(Nothing)
-//    gaze.next().should.be.eql(Nothing)
-//    gaze.isComplete().should.be.true
-//  })
-//
-//  it("take string with no match", () => {
-//    let gaze = Gaze.from("goodbye")
-//    let ts = takeString("hello")
-//    gaze.attempt(ts).should.be.eql(Left({}))
-//    gaze.isComplete().should.be.false
-//    gaze.peek().should.be.eql(Just("g"))
-//    gaze.isComplete().should.be.false
-//  })
-//
-//  it("take string with single char match", () => {
-//    let gaze = Gaze.from("hello")
-//    let ts = takeString("h")
-//    gaze.attempt(ts).should.be.eql(Right("h"))
-//    gaze.isComplete().should.be.false
-//    gaze.peek().should.be.eql(Just("e"))
-//    gaze.isComplete().should.be.false
-//  })
-//
-//  it("take string with full match", () => {
-//    let gaze = Gaze.from("hello")
-//    let ts = takeString("hello")
-//    gaze.attempt(ts).should.be.eql(Right("hello"))
-//    gaze.isComplete().should.be.true
-//    gaze.peek().should.be.eql(Nothing)
-//    gaze.isComplete().should.be.true
-//  })
-//})
+package dev.ligature.gaze
+
+import munit.FunSuite
+
+import scala.collection.mutable.ArrayBuffer
+
+private val fiveStep = takeString("5")
+private val helloStep = takeString("hello")
+private val spaceStep = takeString(" ")
+private val worldStep = takeString("world")
+
+class TakeStringSuite extends FunSuite {
+    test("empty input") {
+        val gaze = Gaze.from("")
+        assertEquals(gaze.attempt(fiveStep), Left(NoMatch))
+        assert(gaze.isComplete())
+    }
+
+    test("single 5 input") {
+        val gaze = Gaze.from("5")
+        assertEquals(gaze.attempt(fiveStep), Right("5"))
+        assert(gaze.isComplete())
+    }
+
+    test("single 4 input") {
+        val gaze = Gaze.from("4")
+        assertEquals(gaze.attempt(fiveStep), Left(NoMatch))
+        assert(!gaze.isComplete())
+    }
+
+    test ("multiple 5s input") {
+        val gaze = Gaze.from("55555")
+        val res = ArrayBuffer[Int]()
+        while(!gaze.isComplete()) {
+            val nres = gaze.attempt(fiveStep)
+            nres match {
+              case Right(m) => res.append(m.toInt)
+              case Left(_) => throw new Error("Should not happen")
+            }
+        }
+        assertEquals(res.toList, List(5,5,5,5,5))
+    }
+
+    test("hello world test") {
+        val gaze = Gaze.from("hello world")
+        assertEquals(gaze.attempt(helloStep), Right("hello"))
+        assertEquals(gaze.attempt(spaceStep), Right(" "))
+        assertEquals(gaze.attempt(worldStep), Right("world"))
+        assert(gaze.isComplete())
+    }
+}
