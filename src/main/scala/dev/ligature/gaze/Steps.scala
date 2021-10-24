@@ -102,37 +102,7 @@ def takeWhile(matcher: (toMatch: Char) => Boolean): (gaze: Gaze[Char]) => Either
     }
 }
 
-//  pub fn take_while<'a, T>(
-//      matcher: &'a dyn Fn(T) -> bool,
-//  ) -> impl Fn(&mut Gaze<T>) -> Result<Vec<T>, NoMatch> + '_
-//  where
-//      T: Copy,
-//  {
-//      move |gaze: &mut Gaze<T>| -> Result<Vec<T>, NoMatch> {
-//          let mut res = Vec::new();
-//          loop {
-//              let next = gaze.next();
-//              match next {
-//                  Some(next) => {
-//                      if matcher(next) {
-//                          res.push(next);
-//                      } else if res.is_empty() {
-//                          return Err(NoMatch);
-//                      } else {
-//                          return Ok(res);
-//                      }
-//                  }
-//                  None => {
-//                      if res.is_empty() {
-//                          return Err(NoMatch);
-//                      } else {
-//                          return Ok(res);
-//                      }
-//                  }
-//              }
-//          }
-//      }
-//  }
+def takeCharacters(chars: Char*): (gaze: Gaze[Char]) => Either[NoMatch, String] = takeWhile { chars.contains(_) }
 
 // /// A Step that takes values from the String until the predicate passes.
 // pub struct TakeUntil<'a>(pub &'a dyn Fn(&str) -> bool);
