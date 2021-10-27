@@ -40,15 +40,11 @@ class TakeCharactersSuite extends FunSuite {
 
     test ("multiple 5s input") {
         val gaze = Gaze.from("55555")
-        val res = ArrayBuffer[Int]()
-        while(!gaze.isComplete()) {
-            val nres = gaze.attempt(fiveStep)
-            nres match {
-              case Right(m) => res.append(m.toInt)
-              case Left(_) => throw new Error("Should not happen")
-            }
+        val res = gaze.attempt(fiveStep) match {
+            case Right(m) => m.toInt
+            case Left(_) => throw new Error("Should not happen")
         }
-        assertEquals(res.toList, List(5,5,5,5,5))
+        assertEquals(res, 55555)
     }
 
     test("abcd test") {

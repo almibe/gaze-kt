@@ -6,8 +6,6 @@ package dev.ligature.gaze
 
 import dev.ligature.gaze.Gaze
 
-import scala.util.control.Breaks.break
-
 trait NoMatch
 object NoMatch extends NoMatch
 
@@ -17,7 +15,7 @@ def takeString(toMatch: String): (gaze: Gaze[Char]) => Either[NoMatch, String] =
     return (gaze) => {
         var offset = 0
         var matched = true
-        while (offset < chars.length) {
+        while (matched && offset < chars.length) {
             val nextChar = gaze.next()
             nextChar match {
                 case Some(c) => {
@@ -25,12 +23,10 @@ def takeString(toMatch: String): (gaze: Gaze[Char]) => Either[NoMatch, String] =
                         offset += 1;
                     } else {
                         matched = false
-                        break
                     }
                 }
                 case None => {
                     matched = false
-                    break
                 }
             }
         }
@@ -67,7 +63,8 @@ def takeWhile(matcher: (toMatch: Char) => Boolean): (gaze: Gaze[Char]) => Either
     return (gaze: Gaze[Char]) => {
         val res = StringBuilder()
         var matched = true
-        while(true) {
+        var continue = true
+        while(continue) {
             val peek = gaze.peek();
 
             peek match {
@@ -77,18 +74,18 @@ def takeWhile(matcher: (toMatch: Char) => Boolean): (gaze: Gaze[Char]) => Either
                         res += c;
                     } else if (res.length == 0) {
                         matched = false
-                        break
+                        continue = false
                     } else {
-                        break
+                        continue = false
                         //return Right(res);
                     }
                 }
                 case None => {
                     if (res.length == 0) {
                         matched = false
-                        break
+                        continue = false
                     } else {
-                        break
+                        continue = false
                         //return Right(res);
                     }
                 }
