@@ -4,6 +4,8 @@
 
 package dev.ligature.gaze
 
+import scala.collection.mutable.ArrayBuffer
+
 object Gaze {
     def from(text: String): Gaze[Char] = { //TODO eventually handle unicode better and make this Gaze[String]
         return new Gaze(text.toVector)
@@ -46,6 +48,23 @@ class Gaze[I](private val input: Vector[I]) {
                 return res
             }
         }
+    }
+
+    def attempt[T, E](steps: Step[I, E, T]*): Either[E, List[T]] = {
+        val startOfThisLoop = this.offset
+        val results: ArrayBuffer[T] = ArrayBuffer()
+
+        for(step <- steps) {
+            val res = step(this)
+            res match {
+                case Right(res) => results.append(res)
+                case Left(e) => {
+                    this.offset = startOfThisLoop
+                    return Left(e)
+                }
+            }
+        }
+        Right(results.toList)
     }
 }
 
