@@ -47,15 +47,6 @@ class Gaze[I](private val input: Vector[I]) {
             }
         }
     }
-
-    def ignore[T, E](step: Step[I, E, T]): Unit = {
-        val startOfThisLoop = this.offset;
-        val res = step(this);
-        res match {
-            case Left(_) => this.offset = startOfThisLoop
-            case Right(_) => return
-        }
-    }
 }
 
 type Step[I, E, T] = (gaze: Gaze[I]) => Either[E, T]
