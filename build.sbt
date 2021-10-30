@@ -5,9 +5,9 @@ organization     := "dev.ligature"
 organizationName := "ligature"
 name             := "gaze"
 
-lazy val root = project
+lazy val root = crossProject(JSPlatform, JVMPlatform)
   .in(file("."))
   .settings(
     scalaVersion := scala3Version,
-    libraryDependencies += "org.scalameta" %% "munit" % "1.0.0-M1" % Test
+    libraryDependencies += "org.scalameta" %%% "munit" % "1.0.0-M1" % Test
   )
